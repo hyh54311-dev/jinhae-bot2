@@ -2,34 +2,47 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>진해고등학교 입학 상담 안내 챗봇</title>
-    <link rel="stylesheet" href="style.css?v=3">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>진해고등학교 | 입학 상담 안내 인공지능 챗봇</title>
+    <meta name="description" content="진해고등학교 입학에 관련된 모든 궁금증을 해결해 드리는 인공지능 상담사입니다.">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css?v=5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div id="chat-container">
         <header>
-            <div class="header-content">
-                <h1><i class="fas fa-school"></i> 진해고등학교</h1>
-                <p>입학 상담 안내 챗봇</p>
-            </div>
+            <img src="logo.png" alt="진해고등학교 로고" class="school-logo">
+            <h1>진해고등학교</h1>
+            <p>입학 상담 안내 인공지능 챗봇</p>
         </header>
+
         <main id="chat-window">
             <div id="chat-messages">
+                <!-- Greeting message -->
                 <div class="message bot-message">
-                    안녕하세요! 😊 진해고등학교 입학에 대해 궁금한 점을 무엇이든 물어보세요.
+                    반갑습니다! 😊 <strong>진해고등학교</strong> 입학에 관심을 가져주셔서 감사합니다. <br><br>
+                    궁금하신 입학 전형, 학교 생활, 기숙사 운영 등에 대해 무엇이든 말씀해 주세요.
                 </div>
             </div>
         </main>
+
         <footer>
             <div id="input-area">
-                <input type="text" id="user-input" placeholder="질문을 입력하세요..." autofocus>
-                <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
+                <input type="text" id="user-input" placeholder="질문을 입력하세요..." autocomplete="off">
+                <button id="send-btn" title="전송">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
-            <p class="contact-info">진해고등학교 홍보팀 | 055-546-2260</p>
+            <div class="contact-info">
+                <p><i class="fas fa-phone-alt"></i> 교무실: 055-546-2260 | <i class="fas fa-map-marker-alt"></i> 경상남도 창원시 진해구</p>
+                <p>&copy; 2026 Jinhae High School. All rights reserved.</p>
+            </div>
         </footer>
     </div>
-    <script src="script.js"></script>
+
+    <!-- Scripts -->
+    <script src="script.js?v=2"></script>
 </body>
 </html>
