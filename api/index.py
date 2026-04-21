@@ -15,10 +15,26 @@ if GEMINI_API_KEY:
 app = FastAPI(title="Kakao Admission Chatbot Webhook")
 
 
+# 정적 파일 서빙 설정 (HTML, CSS, JS)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+public_path = os.path.join(BASE_DIR, 'public')
+
+@app.get("/")
+async def read_index():
+    """메인 페이지(index.html)를 반환합니다."""
+    index_file = os.path.join(public_path, 'index.html')
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {"message": "서버는 정상이나 index.html 파일을 찾을 수 없습니다.", "path": index_file}
+
+# 정적 파일(CSS, JS) 마운트
+if os.path.exists(public_path):
+    app.mount("/static", StaticFiles(directory=public_path), name="static")
+
 @app.get("/api/health")
 async def health_check():
     """서버 상태 확인을 위한 엔드포인트"""
-    return {"status": "healthy", "model": "gemini-3.1-pro-preview"}
+    return {"status": "healthy", "model": "gemini-3.1-pro-preview", "public_path": public_path}
 
 # 지식 베이스 파일 로드 함수
 def load_knowledge():

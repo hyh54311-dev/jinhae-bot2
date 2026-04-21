@@ -3,9 +3,7 @@
   "builds": [
     { "src": "api/index.py", "use": "@vercel/python" }
   ],
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "api/index.py" },
-    { "source": "/static/(.*)", "destination": "public/$1" },
-    { "source": "/(.*)", "destination": "public/index.html" }
+  "routes": [
+    { "src": "/(.*)", "dest": "api/index.py" }
   ]
 }
