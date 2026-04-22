@@ -102,8 +102,31 @@ header {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    background-image: radial-gradient(#f0f2f5 1px, transparent 1px);
-    background-size: 20px 20px;
+    background-color: var(--chat-bg);
+    position: relative; /* For watermark positioning */
+}
+
+/* Watermark Background */
+#chat-history::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px; /* Adjust size as needed */
+    height: 250px;
+    background-image: url('school_logo.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    opacity: 0.5; /* 50% opacity as requested */
+    pointer-events: none; /* Don't block clicks */
+    z-index: 0;
+}
+
+/* Ensure messages stay above watermark */
+.message {
+    z-index: 1;
 }
 
 .message {
