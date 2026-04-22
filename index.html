@@ -2,47 +2,56 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>진해고등학교 | 입학 상담 안내 인공지능 챗봇</title>
-    <meta name="description" content="진해고등학교 입학에 관련된 모든 궁금증을 해결해 드리는 인공지능 상담사입니다.">
-    
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="style.css?v=5">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>진해고등학교 입학 상담 챗봇 2.0</title>
+    <meta name="description" content="진해고등학교 2026학년도 신입생 모집 및 입학 안내를 도와드리는 인공지능 상담 챗봇입니다.">
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
-    <div id="chat-container">
+
+    <div id="app-container">
+        <!-- Header -->
         <header>
-            <img src="logo.png" alt="진해고등학교 로고" class="school-logo">
-            <h1>진해고등학교</h1>
-            <p>입학 상담 안내 인공지능 챗봇</p>
+            <div class="school-logo">
+                <img src="school_logo.png" alt="진해고 교표" style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+            <div class="title-area">
+                <h1>Jinhae High School</h1>
+                <p class="slogan">꿈을 향한 도전, 세계를 향한 비상</p>
+                <p class="subtitle">2026학년도 입학 상담 챗봇 2.0</p>
+            </div>
         </header>
 
-        <main id="chat-window">
-            <div id="chat-messages">
-                <!-- Greeting message -->
-                <div class="message bot-message">
-                    반갑습니다! 😊 <strong>진해고등학교</strong> 입학에 관심을 가져주셔서 감사합니다. <br><br>
-                    궁금하신 입학 전형, 학교 생활, 기숙사 운영 등에 대해 무엇이든 말씀해 주세요.
-                </div>
+        <!-- Chat History -->
+        <div id="chat-history">
+            <div class="message bot-message">
+                반갑습니다! 😊 진해고등학교 입학 상담 챗봇입니다. <br>
+                신입생 모집 일정부터 기숙사, 장학금 정보까지 무엇이든 물어보세요!
             </div>
-        </main>
+        </div>
 
-        <footer>
-            <div id="input-area">
-                <input type="text" id="user-input" placeholder="질문을 입력하세요..." autocomplete="off">
-                <button id="send-btn" title="전송">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-            <div class="contact-info">
-                <p><i class="fas fa-phone-alt"></i> 교무실: 055-546-2260 | <i class="fas fa-map-marker-alt"></i> 경상남도 창원시 진해구</p>
-                <p>&copy; 2026 Jinhae High School. All rights reserved.</p>
-            </div>
-        </footer>
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="sendQuickMessage('입학 일정이 궁금해')">📅 입학 일정</button>
+            <button class="quick-btn" onclick="sendQuickMessage('기숙사 선발 기준')">🛌 기숙사 안내</button>
+            <button class="quick-btn" onclick="sendQuickMessage('장학금 제도')">💰 장학금 혜택</button>
+            <button class="quick-btn" onclick="sendQuickMessage('작년 입시 결과')">🎓 대입 결과</button>
+        </div>
+
+        <!-- Input Area -->
+        <form class="input-area" id="chat-form">
+            <input type="text" id="user-input" placeholder="질문을 입력해 주세요..." autocomplete="off">
+            <button type="submit" id="send-btn">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </form>
     </div>
 
-    <!-- Scripts -->
-    <script src="script.js?v=2"></script>
+    <!-- Data & Scripts -->
+    <script src="admission_knowledge.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
