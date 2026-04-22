@@ -1,7 +1,7 @@
-from datetime import datetime
-import json
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
+import os
+import asyncio
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse, StreamingResponse
 import google.generativeai as genai
 from dotenv import load_dotenv
 
@@ -12,40 +12,6 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-
-# 구글 시트 설정
-SPREADSHEET_ID = os.getenv("SPREADSHEET_ID", "")
-SERVICE_ACCOUNT_INFO = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON", "")
-
-def log_to_google_sheet(user_msg, bot_msg):
-    """상담 내역을 구글 시트에 기록"""
-    if not SPREADSHEET_ID or not SERVICE_ACCOUNT_INFO:
-        print("Google Sheets configuration missing. Skipping log.")
-        return
-
-    try:
-        # 서비스 계정 인증
-        info = json.loads(SERVICE_ACCOUNT_INFO)
-        creds = service_account.Credentials.from_service_account_info(
-            info, scopes=['https://www.googleapis.com/auth/spreadsheets']
-        )
-        service = build('sheets', 'v4', credentials=creds)
-
-        # 데이터 구성 (시간, 질문, 답변)
-        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        values = [[now, user_msg, bot_msg]]
-        body = {'values': values}
-
-        # 시트의 마지막 행에 추가
-        service.spreadsheets().values().append(
-            spreadsheetId=SPREADSHEET_ID,
-            range='A1',
-            valueInputOption='RAW',
-            body=body
-        ).execute()
-        print(f"Logged to Google Sheet: {user_msg[:20]}...")
-    except Exception as e:
-        print(f"Google Sheets logging error: {e}")
 
 app = FastAPI()
 
@@ -91,8 +57,9 @@ async def chat_endpoint(request: Request):
             print("ERROR: GEMINI_API_KEY is not set!")
             return JSONResponse(content={"error": "API 키가 설정되지 않았습니다."}, status_code=500)
 
-        # 모델 설정 (Gemini 3.1 Flash Lite Preview - 속도 최적화)
-        model_name = 'gemini-3.1-flash-lite-preview' 
+        # 모델 설정 (Gemini 3.1 Pro Preview)
+        # 만약 모델명이 변경되었다면 여기서 수정 가능
+        model_name = 'gemini-3.1-pro-preview' 
         print(f"Initializing model: {model_name}")
         
         model = genai.GenerativeModel(model_name)
@@ -104,17 +71,10 @@ async def chat_endpoint(request: Request):
         )
         
         async def stream_generator():
-            full_response = ""
             for chunk in response:
                 if chunk.text:
-                    full_response += chunk.text
                     yield chunk.text
                 await asyncio.sleep(0.01)
-            
-            # 스트리밍 완료 후 백그라운드에서 구글 시트 기록
-            if full_response:
-                # 비동기 실행을 위해 별도 태스크로 처리
-                asyncio.create_task(asyncio.to_thread(log_to_google_sheet, user_message, full_response))
 
         return StreamingResponse(stream_generator(), media_type="text/plain")
 
