@@ -1,6 +1,7 @@
 import os
+import asyncio
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 import google.generativeai as genai
 from dotenv import load_dotenv
 
@@ -38,14 +39,16 @@ SYSTEM_PROMPT = f"""너는 '진해고등학교'의 공식 입학 상담 조수�
 {KNOWLEDGE_BASE}
 """
 
+
+
 @app.get("/api/health")
 async def health_check():
     """Vercel에서 API 작동 여부를 확인하기 위한 엔드포인트"""
-    return {"status": "healthy", "model": "gemini-3.1-pro-preview"}
+    return {"status": "healthy", "model": "gemini-1.5-flash"}
 
 @app.post("/api/chat")
 async def web_chat(request: Request):
-    """채팅 질문에 대해 답변을 생성하여 반환합니다."""
+    """채팅 질문에 대해 답변을 생성하여 실시간 스트리밍으로 전송합니다."""
     try:
         payload = await request.json()
         user_utterance = payload.get("message", payload.get("userRequest", {}).get("utterance", ""))
@@ -53,11 +56,21 @@ async def web_chat(request: Request):
         if not user_utterance:
             return JSONResponse(content={"reply": "질문을 입력해 주세요!"}, status_code=400)
 
-        # Gemini 모델 호출
-        model = genai.GenerativeModel('gemini-3.1-pro-preview') 
-        response = model.generate_content(f"{SYSTEM_PROMPT}\n\n사용자 질문: {user_utterance}\n답변:")
+        # Gemini 1.5 Flash 모델 호출 (속도 최적화)
+        model = genai.GenerativeModel('gemini-1.5-flash') 
+        response = model.generate_content(
+            f"{SYSTEM_PROMPT}\n\n사용자 질문: {user_utterance}\n답변:",
+            stream=True
+        )
         
-        return {"reply": response.text.strip()}
+        async def event_generator():
+            for chunk in response:
+                if chunk.text:
+                    yield chunk.text
+                await asyncio.sleep(0.01) # 부드러운 출력을 위한 미세 지연
+
+        return StreamingResponse(event_generator(), media_type="text/plain")
+
     except Exception as e:
         print(f"Error during Gemini processing: {e}")
         return JSONResponse(
