@@ -96,7 +96,7 @@ async def chat_endpoint(request: Request, background_tasks: BackgroundTasks):
             return JSONResponse(content={"error": "API 키가 설정되지 않았습니다."}, status_code=500)
 
         # 모델 설정 (Gemini 3.1 Flash Lite Preview - 속도 최적화)
-        model_name = 'gemini-3.1-flash-lite-preview' 
+        model_name = 'gemini-3.1-flash-lite' 
         print(f"Initializing model: {model_name}")
         
         model = genai.GenerativeModel(model_name)
@@ -131,4 +131,4 @@ async def chat_endpoint(request: Request, background_tasks: BackgroundTasks):
 # 상태 확인용
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "model": "gemini-3.1-pro-preview"}
+    return {"status": "ok", "model": "gemini-3.1-flash-lite"}
