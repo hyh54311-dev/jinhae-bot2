@@ -21,6 +21,37 @@ if GEMINI_API_KEY:
 SPREADSHEET_ID = os.getenv("SPREADSHEET_ID", "")
 SERVICE_ACCOUNT_INFO = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON", "")
 
+def sanitize_json_string(s):
+    """JSON 문자열 내부의 실제 개행 및 제어 문자를 안전하게 이스케이프"""
+    if not s:
+        return s
+    result = []
+    in_string = False
+    escape = False
+    for char in s:
+        if char == '"' and not escape:
+            in_string = not in_string
+            result.append(char)
+        elif char == '\\' and in_string:
+            escape = not escape
+            result.append(char)
+        else:
+            if in_string:
+                if char == '\n':
+                    result.append('\\n')
+                elif char == '\r':
+                    pass
+                elif char == '\t':
+                    result.append('\\t')
+                elif ord(char) < 32:
+                    pass
+                else:
+                    result.append(char)
+            else:
+                result.append(char)
+            escape = False
+    return "".join(result)
+
 def log_to_google_sheet(user_msg, bot_msg):
     """상담 내역을 구글 시트에 기록"""
     if not SPREADSHEET_ID or not SERVICE_ACCOUNT_INFO:
@@ -28,9 +59,9 @@ def log_to_google_sheet(user_msg, bot_msg):
         return
 
     try:
-        # 서비스 계정 인증 (Vercel 환경 변수 줄바꿈 \n 이스케이프 깨짐 방지)
-        service_account_str = SERVICE_ACCOUNT_INFO.replace('\\n', '\n')
-        info = json.loads(service_account_str)
+        # 서비스 계정 인증 (제어 문자 및 개행 문자 문제 자동 보정)
+        cleaned_json = sanitize_json_string(SERVICE_ACCOUNT_INFO)
+        info = json.loads(cleaned_json)
         creds = service_account.Credentials.from_service_account_info(
             info, scopes=['https://www.googleapis.com/auth/spreadsheets']
         )
