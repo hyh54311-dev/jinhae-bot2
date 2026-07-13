@@ -28,8 +28,9 @@ def log_to_google_sheet(user_msg, bot_msg):
         return
 
     try:
-        # 서비스 계정 인증
-        info = json.loads(SERVICE_ACCOUNT_INFO)
+        # 서비스 계정 인증 (Vercel 환경 변수 줄바꿈 \n 이스케이프 깨짐 방지)
+        service_account_str = SERVICE_ACCOUNT_INFO.replace('\\n', '\n')
+        info = json.loads(service_account_str)
         creds = service_account.Credentials.from_service_account_info(
             info, scopes=['https://www.googleapis.com/auth/spreadsheets']
         )
@@ -109,15 +110,26 @@ async def chat_endpoint(request: Request, background_tasks: BackgroundTasks):
         
         async def stream_generator():
             full_response = ""
-            for chunk in response:
-                if chunk.text:
-                    full_response += chunk.text
-                    yield chunk.text
-                await asyncio.sleep(0.01)
+            try:
+                for chunk in response:
+                    # chunk.text가 유효한지 안전하게 확인 (Safety filter 등으로 인한 오류 방지)
+                    try:
+                        if chunk.text:
+                            full_response += chunk.text
+                            yield chunk.text
+                    except ValueError:
+                        print("Chunk contains no text (blocked or empty).")
+                    
+                    await asyncio.sleep(0.01)
+            except Exception as stream_err:
+                print(f"Error during streaming: {stream_err}")
             
-            # 스트리밍 완료 후 백그라운드 작업으로 구글 시트 기록 등록
+            # 스트리밍 완료 후 서버가 응답을 끝내기 전에 즉시 구글 시트에 기록 (Vercel Serverless Freeze 방지)
             if full_response:
-                background_tasks.add_task(log_to_google_sheet, user_message, full_response)
+                try:
+                    await asyncio.to_thread(log_to_google_sheet, user_message, full_response)
+                except Exception as log_err:
+                    print(f"Failed to log to Google Sheet: {log_err}")
 
         return StreamingResponse(stream_generator(), media_type="text/plain")
 
