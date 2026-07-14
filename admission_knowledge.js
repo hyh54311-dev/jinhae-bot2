@@ -29,6 +29,10 @@ const ADMISSION_KNOWLEDGE = {
   dormitory: {
     names: ["송학관 (36명)", "동백관 (117명)"],
     total_capacity: 153,
+    assignments: {
+      dongbaek: "1학년 전체, 2학년 전체, 3학년 일부 학생 배정 (1,2학년은 1실 3인 생활, 3학년은 1실 2인 생활)",
+      songhak: "3학년 학생 배정 (1실 2인 생활)"
+    },
     new_student_selection: {
       criteria: "중학교 3년간 내신 성적 우수자 및 사회적 배려대상자",
       local_cutoff: "진해 관내(용원, 웅동, 웅천 제외): 내신 5% 이내 우선 선발",
@@ -46,13 +50,16 @@ const ADMISSION_KNOWLEDGE = {
       "진해인재육성 장학재단"
     ]
   },
-  university_results_2025: {
+  university_results_2026: {
     key_highlights: [
-      "서울대 3명",
-      "의예과 16명",
-      "연세대/고려대 8명",
-      "의치한약수 합계 20명 이상",
-      "부산대/경북대 등 국립대 다수"
+      "서울대 1명",
+      "의예과 3명",
+      "한의대·약대·수의대 1명",
+      "연세대 2명, 고려대 2명",
+      "서강대 3명, 성균관대 4명, 한양대 4명",
+      "해군사관학교 6명, 육군사관학교 1명",
+      "부산대 17명, 경북대 12명",
+      "부경대·경상국립대·창원대 57명"
     ]
   },
   special_programs: [
