@@ -11,13 +11,13 @@ const ADMISSION_KNOWLEDGE = {
     phone_office: "055-546-2260",
     homepage: "http://jinhae-h.gne.go.kr"
   },
-  admission_2026: {
-    quota: "남학생 10개 학급, 총 300명",
+  admission_2027: {
+    quota: "보통과 남학생 10개 학급, 총 300명 (정원 내 300명, 정원 외 교육지원 9명, 특례입학 9명 이내)",
     schedule: {
-      application_start: "2025. 12. 11.(목)",
-      application_end: "2025. 12. 15.(월) 15:40",
-      announcement: "2025. 12. 26.(금) 10:00",
-      registration_period: "2025. 12. 29.(월) ~ 12. 30.(화) 16:00"
+      application_start: "2026. 12. 10.(목) 10:00",
+      application_end: "2026. 12. 14.(월) 14:00",
+      announcement: "2026. 12. 30.(수) 10:00",
+      registration_period: "2027. 1. 4.(월) 16:30까지 (등록확인서 제출)"
     },
     qualifications: [
       "경상남도 소재 중학교 졸업(예정)자",
@@ -32,11 +32,12 @@ const ADMISSION_KNOWLEDGE = {
     new_student_selection: {
       criteria: "중학교 3년간 내신 성적 우수자 및 사회적 배려대상자",
       local_cutoff: "진해 관내(용원, 웅동, 웅천 제외): 내신 5% 이내 우선 선발",
-      outside_cutoff: "진해 관외(용원 포함): 내신 30% 이내 우선 선발"
+      outside_cutoff: "진해 관외(구 창원, 구 마산, 김해 등과 진해지역 중 용원, 웅천 포함) 학생: 내신 30% 이내 우선 선발"
     }
   },
   scholarships: {
     annual_amount: "약 1억원 규모 (향후 20년간 유지 계획)",
+    payment_method: "제출한 통장 또는 스쿨뱅킹 계좌로 지급 (일부 장학금에 한해 문화상품권으로 지급)",
     types: [
       "진해고 총동창회 장학금 (성적 우수 16명)",
       "애향삼품 장학금",
