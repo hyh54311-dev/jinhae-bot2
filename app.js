@@ -42,6 +42,9 @@ function showLoading() {
     return loadingDiv;
 }
 
+// 대화 흐름 저장을 위한 전역 기록 배열
+let conversationHistory = [];
+
 /**
  * 스트리밍 대화 처리
  */
@@ -52,7 +55,10 @@ async function handleChat(prompt) {
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: prompt })
+            body: JSON.stringify({ 
+                message: prompt,
+                history: conversationHistory.slice(0, -1) // 현재 질문 직전까지의 대화 기록 전송
+            })
         });
 
         if (!response.ok) {
@@ -79,6 +85,14 @@ async function handleChat(prompt) {
             contentDiv.innerHTML = fullText.replace(/\n/g, '<br>');
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
+
+        // 봇 답변 기록에 추가
+        conversationHistory.push({ role: 'bot', message: fullText });
+
+        // 대화 기록 최대 10개(5턴)로 제한하여 슬라이싱 (서버 부하 및 토큰 최적화)
+        if (conversationHistory.length > 10) {
+            conversationHistory = conversationHistory.slice(-10);
+        }
     } catch (error) {
         console.error('Chat Error:', error);
         loadingIndicator.remove();
@@ -94,8 +108,9 @@ chatForm.addEventListener('submit', async (e) => {
     const text = userInput.value.trim();
     if (!text) return;
 
-    // 사용자 메시지 추가
+    // 사용자 메시지 화면 표시 및 대화 기록 추가
     addMessage('user', text);
+    conversationHistory.push({ role: 'user', message: text });
     userInput.value = '';
 
     // 봇 답변 요청

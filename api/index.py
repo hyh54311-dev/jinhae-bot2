@@ -1,6 +1,6 @@
 import os
 import asyncio
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import json
 from fastapi import FastAPI, Request, BackgroundTasks
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -68,7 +68,7 @@ def log_to_google_sheet(user_msg, bot_msg):
         service = build('sheets', 'v4', credentials=creds)
 
         # 데이터 구성 (시간, 질문, 답변)
-        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        now = datetime.now(timezone(timedelta(hours=9))).strftime('%Y-%m-%d %H:%M:%S')
         values = [[now, user_msg, bot_msg]]
         body = {'values': values}
 
@@ -127,17 +127,32 @@ async def chat_endpoint(request: Request, background_tasks: BackgroundTasks):
             print("ERROR: GEMINI_API_KEY is not set!")
             return JSONResponse(content={"error": "API 키가 설정되지 않았습니다."}, status_code=500)
 
+        history = payload.get("history", [])
+
         # 모델 설정 (Gemini 3.1 Flash Lite Preview - 속도 최적화)
         model_name = 'gemini-3.1-flash-lite' 
         print(f"Initializing model: {model_name}")
         
-        model = genai.GenerativeModel(model_name)
-        
-        # 스트리밍 생성
-        response = model.generate_content(
-            f"{SYSTEM_PROMPT}\n\n질문: {user_message}\n답변:",
-            stream=True
+        # 시스템 지침을 명시하여 모델 인스턴스화
+        model = genai.GenerativeModel(
+            model_name=model_name,
+            system_instruction=SYSTEM_PROMPT
         )
+        
+        # 대화 기록 포맷팅 (Gemini SDK 역할명에 맞춰 변환)
+        gemini_history = []
+        for h in history:
+            role = "user" if h.get("role") == "user" else "model"
+            content = h.get("message", "")
+            if content:
+                gemini_history.append({
+                    "role": role,
+                    "parts": [content]
+                })
+
+        # 대화 세션 시작 및 스트리밍 답변 생성
+        chat = model.start_chat(history=gemini_history)
+        response = chat.send_message(user_message, stream=True)
         
         async def stream_generator():
             full_response = ""
@@ -174,4 +189,4 @@ async def chat_endpoint(request: Request, background_tasks: BackgroundTasks):
 # 상태 확인용
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "model": "gemini-3.1-flash-lite", "version": "v2.1"}
+    return {"status": "ok", "model": "gemini-3.1-flash-lite", "version": "v2.2"}
