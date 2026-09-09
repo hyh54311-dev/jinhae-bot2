@@ -189,4 +189,4 @@ async def chat_endpoint(request: Request, background_tasks: BackgroundTasks):
 # 상태 확인용
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "model": "gemini-3.1-flash-lite", "version": "v3.5-briefing-registration-trends"}
+    return {"status": "ok", "model": "gemini-3.1-flash-lite", "version": "v3.6-dorm-program-open-policy"}
