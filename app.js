@@ -8,6 +8,30 @@ const chatForm = document.getElementById('chat-form');
 const userInput = document.getElementById('user-input');
 
 /**
+ * HTML 특수문자 이스케이프 (XSS 공격 방어)
+ */
+function escapeHtml(text) {
+    if (!text) return "";
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+/**
+ * 안전한 텍스트 포맷팅 (XSS 방어 + 줄바꿈 및 강조 보존)
+ */
+function formatMessage(text) {
+    if (!text) return "";
+    let escaped = escapeHtml(text);
+    // **강조**를 안전하게 <strong> 태그로 변환
+    escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    return escaped.replace(/\n/g, '<br>');
+}
+
+/**
  * 메시지 화면 추가
  */
 function addMessage(role, text = "") {
@@ -16,7 +40,7 @@ function addMessage(role, text = "") {
     
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
-    contentDiv.innerHTML = text.replace(/\n/g, '<br>');
+    contentDiv.innerHTML = formatMessage(text);
     
     messageDiv.appendChild(contentDiv);
     chatHistory.appendChild(messageDiv);
@@ -81,8 +105,8 @@ async function handleChat(prompt) {
             const chunk = decoder.decode(value, { stream: true });
             fullText += chunk;
             
-            // 텍스트 업데이트
-            contentDiv.innerHTML = fullText.replace(/\n/g, '<br>');
+            // 텍스트 업데이트 (안전한 포맷팅 적용)
+            contentDiv.innerHTML = formatMessage(fullText);
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
@@ -107,6 +131,11 @@ chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const text = userInput.value.trim();
     if (!text) return;
+
+    if (text.length > 300) {
+        alert("질문은 300자 이내로 입력해주세요.");
+        return;
+    }
 
     // 사용자 메시지 화면 표시 및 대화 기록 추가
     addMessage('user', text);
