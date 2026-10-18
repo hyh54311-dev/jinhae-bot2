@@ -66,8 +66,9 @@ function showLoading() {
     return loadingDiv;
 }
 
-// 대화 흐름 저장을 위한 전역 기록 배열
+// 대화 흐름 저장을 위한 전역 기록 배열 및 중복 전송 방지 플래그
 let conversationHistory = [];
+let isSubmitting = false;
 
 /**
  * 스트리밍 대화 처리
@@ -129,6 +130,8 @@ async function handleChat(prompt) {
  */
 chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     const text = userInput.value.trim();
     if (!text) return;
 
@@ -137,19 +140,26 @@ chatForm.addEventListener('submit', async (e) => {
         return;
     }
 
-    // 사용자 메시지 화면 표시 및 대화 기록 추가
-    addMessage('user', text);
-    conversationHistory.push({ role: 'user', message: text });
-    userInput.value = '';
+    isSubmitting = true;
+    try {
+        // 사용자 메시지 화면 표시 및 대화 기록 추가
+        addMessage('user', text);
+        conversationHistory.push({ role: 'user', message: text });
+        userInput.value = '';
 
-    // 봇 답변 요청
-    await handleChat(text);
+        // 봇 답변 요청
+        await handleChat(text);
+    } finally {
+        isSubmitting = false;
+        userInput.focus();
+    }
 });
 
 /**
  * 퀵 액션 버튼 처리
  */
 function sendQuickMessage(text) {
+    if (isSubmitting) return;
     userInput.value = text;
     chatForm.dispatchEvent(new Event('submit'));
 }
