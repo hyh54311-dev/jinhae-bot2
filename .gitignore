@@ -1,7 +1,12 @@
 # Local env files
 api/.env
 .env
-.env.local
+.env.*
+*service_account*.json
+token*.json
+*.log
+production
+.vercel/
 
 # Python caches
 **/__pycache__/
